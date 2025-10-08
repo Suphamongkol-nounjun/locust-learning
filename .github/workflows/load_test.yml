@@ -35,20 +35,17 @@ jobs:
           LOCUST_USERNAME: ${{ secrets.LOCUST_USERNAME }}
           LOCUST_PASSWORD: ${{ secrets.LOCUST_PASSWORD }}
           LOCUST_DEVICE: ${{ secrets.LOCUST_DEVICE }}
-          TARGET_URL: ${{ secrets.TARGET_URL }}
         run: |
           mkdir -p reports
           echo "✅ Environment variables loaded:"
           echo "  Username: $LOCUST_USERNAME"
           echo "  Device: $LOCUST_DEVICE"
-          echo "  Target URL: $TARGET_URL"
 
           python -m locust -f locustfile.py \
             --headless \
             -u ${USERS:-5} \
             -r ${SPAWN_RATE:-2} \
             --run-time ${RUN_TIME:-1m} \
-            --host ${TARGET_URL} \
             --html reports/locust_report.html \
             --csv reports/locust_stats
 
