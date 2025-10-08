@@ -1,56 +1,58 @@
 name: Locust Load Test
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   load-test:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout source code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
-      - name: Install dependencies (explicit)
+      # Install dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade locust python-dotenv
-          python -m pip show locust || echo "Locust not found!"
+          pip install -r requirements.txt
+          pip list
 
-      - name: Verify Locust installation
-        run: |
-          python -m pip list | grep locust || true
-          python -m locust --version || echo "Locust still missing!"
-
-      - name: Load environment variables (optional)
-        run: |
-          if [ -f .env ]; then
-            echo "Loading .env..."
-            export $(grep -v '^#' .env | xargs)
-          else
-            echo "No .env file found"
-          fi
-
+      # Run Locust test
       - name: Run Locust headless test
+        env:
+          LOCUST_USERNAME: ${{ secrets.LOCUST_USERNAME }}
+          LOCUST_PASSWORD: ${{ secrets.LOCUST_PASSWORD }}
+          LOCUST_DEVICE: ${{ secrets.LOCUST_DEVICE }}
+          TARGET_URL: ${{ secrets.TARGET_URL }}
         run: |
           mkdir -p reports
+          echo "✅ Environment variables loaded:"
+          echo "  Username: $LOCUST_USERNAME"
+          echo "  Device: $LOCUST_DEVICE"
+          echo "  Target URL: $TARGET_URL"
+
           python -m locust -f locustfile.py \
             --headless \
             -u ${USERS:-5} \
             -r ${SPAWN_RATE:-2} \
             --run-time ${RUN_TIME:-1m} \
-            --host ${TARGET_URL:-https://example.com} \
+            --host ${TARGET_URL} \
             --html reports/locust_report.html \
             --csv reports/locust_stats
 
+      # Upload test reports
       - name: Upload Locust report
         uses: actions/upload-artifact@v4
         with:
