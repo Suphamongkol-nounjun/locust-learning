@@ -42,9 +42,9 @@ load_dotenv()
 # 🚨 กำหนดค่า Credentials สำหรับการ Login
 # (คุณต้องแทนที่ค่าเหล่านี้ด้วย Username/Password ที่ใช้งานได้จริงในระบบ)
 USER_CREDENTIALS = {
-    "username": os.environ.get("LOCUST_TEST_USERNAME"),
-    "password": os.environ.get("LOCUST_TEST_PASSWORD"),
-    "device": os.environ.get("LOCUST_TEST_DEVICE", "BACKEND") 
+    "username": os.environ.get("LOCUST_USERNAME"),
+    "password": os.environ.get("LOCUST_PASSWORD"),
+    "device": os.environ.get("LOCUST_DEVICE", "BACKEND") 
 }
 
 class HendrixAPILoadTest(HttpUser):
