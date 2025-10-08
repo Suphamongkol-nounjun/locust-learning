@@ -29,17 +29,17 @@ jobs:
           echo "Loading .env"
           export $(grep -v '^#' .env | xargs)
 
-      - name: Run Locust in headless mode
+      - name: Run Locust headless test
         run: |
-          mkdir -p reports
-          locust -f locustfile.py \
-            --headless \
-            -u ${USERS:-5} \
-            -r ${SPAWN_RATE:-2} \
-            --run-time ${RUN_TIME:-1m} \
-            --host ${TARGET_URL:-https://example.com} \
-            --html reports/locust_report.html \
-            --csv reports/locust_stats
+         mkdir -p reports
+         python -m locust -f locustfile.py \
+           --headless \
+           -u ${USERS:-5} \
+           -r ${SPAWN_RATE:-2} \
+           --run-time ${RUN_TIME:-1m} \
+           --host ${TARGET_URL:-https://example.com} \
+           --html reports/locust_report.html \
+           --csv reports/locust_stats
 
       - name: Upload Locust report
         uses: actions/upload-artifact@v4
